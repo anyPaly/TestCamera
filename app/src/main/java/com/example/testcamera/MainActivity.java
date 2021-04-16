@@ -12,6 +12,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -22,6 +23,9 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import kotlin.Unit;
+import kotlin.jvm.functions.Function3;
 
 public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
@@ -38,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
             dispatchTakePictureIntent();
         });
         binding.btnTakePic.setOnClickListener(view -> {
-            
+
         });
     }
 
