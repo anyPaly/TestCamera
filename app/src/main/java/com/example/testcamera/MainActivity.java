@@ -18,8 +18,10 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.example.testcamera.databinding.ActivityMainBinding;
+import com.yalantis.ucrop.UCrop;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -42,8 +44,17 @@ public class MainActivity extends AppCompatActivity {
             dispatchTakePictureIntent();
         });
         binding.btnTakePic.setOnClickListener(view -> {
-
+            UCrop.of(Uri.fromFile(new File(currentPhotoPath)), getDestinationUri())
+                 .withAspectRatio(1f, 1f)
+                 .withMaxResultSize(500, 500)
+                 .start(this);
         });
+    }
+
+    private Uri getDestinationUri()  {
+        String fileName = String.format("fr_crop_%s.jpg", System.currentTimeMillis());
+        File cropFile = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), fileName);
+        return Uri.fromFile(cropFile);
     }
 
     private void dispatchTakePictureIntent() {
@@ -92,6 +103,11 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             setPic();
+        } else if (requestCode == UCrop.REQUEST_CROP && resultCode == RESULT_OK) {
+            Uri imgUri = UCrop.getOutput(data);
+            setPic(imgUri);
+        } else if (requestCode == UCrop.RESULT_ERROR  && resultCode == RESULT_OK) {
+
         }
     }
 
@@ -113,5 +129,15 @@ public class MainActivity extends AppCompatActivity {
 
         Bitmap bitmap = BitmapFactory.decodeFile(currentPhotoPath, bmOptions);
         binding.tvPhoto.setImageBitmap(bitmap);
+    }
+
+    private void setPic(Uri imgUri) {
+        Bitmap bitmap = null;
+        try {
+            bitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(imgUri));
+            binding.tvPhoto.setImageBitmap(bitmap);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 }
